@@ -1,15 +1,23 @@
-// module 2 from 3rd party
+
 const express = require('express');
+const fs = require('fs');
 
 const app = express();
-// Get
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'hello', app: 'Natours' });
-});
 
-//POST
-app.post('/', (req, res) => {
-  res.send('you can post to this endpoint... ');
+// b1 : Ensure it's JavaScript object.
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`),
+);
+
+app.get('/api/v1/tours', (req, res) => {
+  // b2 send back to client
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      tours,
+    },
+  });
 });
 
 app.listen(3000, () => {
