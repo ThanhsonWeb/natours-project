@@ -6,10 +6,12 @@ const app = express();
 
 // 1 Middleware
 
+app.use(morgan("dev"))
+
 app.use(express.json()); // get access to req.body
 
-//b1  Create our own middleware
-// middleware apply to  every request
+// Create our own middleware
+// Middleware apply to  every request
 app.use((req, res, next) => {
   console.log('hello from middleware 🌟');
   next();
@@ -24,7 +26,7 @@ app.use((req, res, next) => {
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`),
 );
-// 1. Handler Route
+// 2. Handler Route
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -107,6 +109,7 @@ const deleteTour = (req, res) => {
   });
 };
 
+// 3. Routes
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
 app
@@ -114,6 +117,8 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+
 
 app.listen(3000, () => {
   console.log(`App running on port 3000...`);
