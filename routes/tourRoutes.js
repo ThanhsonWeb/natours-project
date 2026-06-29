@@ -6,13 +6,17 @@ const {
   getTour,
   updateTour,
   deleteTour,
+  checkId,
+  checkBody,
 } = require('../controllers/tourController');
 
-// Routes
-
 const tourRouter = express.Router();
+// create checkId middleware function
+// if the id > tours.length -> res(invalid) -> 404
+tourRouter.param('id', checkId);
 
-tourRouter.route('/').get(getAllTours).post(createTour);
+// Routes
+tourRouter.route('/').get(getAllTours).post(checkBody, createTour);
 
 tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
