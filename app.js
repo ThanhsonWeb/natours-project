@@ -1,8 +1,8 @@
 const express = require('express');
 
 const morgan = require('morgan');
-const tourRouter = require("./routes/tourRoutes")
-const userRouter = require("./routes/tourRoutes")
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/tourRoutes');
 
 const app = express();
 
@@ -10,7 +10,7 @@ const app = express();
 
 app.use(morgan('dev'));
 
-app.use(express.json()); 
+app.use(express.json());
 // Create our own middleware
 // Middleware apply to  every request
 app.use((req, res, next) => {
@@ -28,6 +28,4 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-app.listen(3000, () => {
-  console.log(`App running on port 3000...`);
-});
+module.exports = app;
