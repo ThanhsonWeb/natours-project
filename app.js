@@ -6,11 +6,17 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-// 1 Middleware
-app.use(morgan('dev'));
+// 1
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 app.use(express.json());
-// Create our own middleware
+// makes everything inside /public accessible to the browser.
+// ex : http://localhost:3000/overview.html
+app.use(express.static(`${__dirname}/public`));
+
 // Middleware apply to  every request
 app.use((req, res, next) => {
   console.log('hello from middleware 🌟');
@@ -18,7 +24,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
+  req.requestTime = new Date().toISOString();                                                                          
   console.log(req.requestTime);
   next();
 });

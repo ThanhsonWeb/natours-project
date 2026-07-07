@@ -10,6 +10,8 @@ const {
   checkBody,
 } = require('../controllers/tourController');
 
+
+
 const tourRouter = express.Router();
 // create checkId middleware function
 // if the id > tours.length -> res(invalid) -> 404
