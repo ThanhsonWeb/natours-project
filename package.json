@@ -4,7 +4,7 @@
   "description": "Leaning node , express and mongoDB",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
+    "start": "nodemon server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js"
   },
   "author": "Son Jony",
@@ -12,6 +12,8 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongodb": "^7.5.0",
+    "mongoose": "^5.13.23",
     "morgan": "^1.11.0"
   },
   "devDependencies": {
