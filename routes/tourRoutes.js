@@ -13,9 +13,8 @@ const {
 
 
 const tourRouter = express.Router();
-// create checkId middleware function
-// if the id > tours.length -> res(invalid) -> 404
-tourRouter.param('id', checkId);
+
+// tourRouter.param('id', checkId);
 
 // Routes
 tourRouter.route('/').get(getAllTours).post(checkBody, createTour);

@@ -1,23 +1,23 @@
 {
-  "name": "natours",
-  "version": "1.0.0",
-  "description": "Leaning node , express and mongoDB",
-  "main": "index.js",
-  "scripts": {
-    "start": "nodemon server.js",
-    "start:prod": "cross-env NODE_ENV=production node server.js"
-  },
-  "author": "Son Jony",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mongodb": "^7.5.0",
-    "mongoose": "^5.13.23",
-    "morgan": "^1.11.0"
-  },
-  "devDependencies": {
-    "cross-env": "^10.1.0",
-    "nodemon": "^3.1.14"
-  }
+	"name": "natours",
+	"version": "1.0.0",
+	"description": "Leaning node , express and mongoDB",
+	"main": "index.js",
+	"scripts": {
+		"start": "nodemon server.js",
+		"start:prod": "cross-env NODE_ENV=production node server.js"
+	},
+	"author": "Son Jony",
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^17.4.2",
+		"express": "^5.2.1",
+		"mongodb": "^7.5.0",
+		"mongoose": "^5.13.23",
+		"morgan": "^1.11.0"
+	},
+	"devDependencies": {
+		"cross-env": "^10.1.0",
+		"nodemon": "^3.1.14"
+	}
 }
