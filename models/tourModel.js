@@ -15,7 +15,8 @@ const tourSchema = new mongoose.Schema({
 		required: [true, "A tour must have a price"],
 	},
 });
-
+// Tour (tours collections) is a Mongoose model -> we perform CRUD on Tour,
+//
 const Tour = mongoose.model("Tour", tourSchema);
 
-module.exports = Tour
+module.exports = Tour;
