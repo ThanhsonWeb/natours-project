@@ -1,22 +1,62 @@
 const mongoose = require("mongoose");
-// Schema = define data structure
-// Model = Tool (used to create, read, update, delete data)
+
 const tourSchema = new mongoose.Schema({
 	name: {
 		type: String,
 		required: [true, "A tour must have a name"], //validate
+		trim: true,
 	},
-	rating: {
+
+	duration: {
+		type: Number,
+		required: [true, "A tour must have a duration"],
+	},
+
+	maxGroupSize: {
+		type: Number,
+		required: [true, "A tour must have a group size"],
+	},
+
+	difficulty: {
+		type: String,
+		required: [true, "A tour must have a difficulty"], //validate
+	},
+
+	ratingsAverage: {
 		type: Number,
 		default: 4.5,
+	},
+
+	ratingsQuantity: {
+		type: Number,
+		default: 0,
 	},
 	price: {
 		type: Number,
 		required: [true, "A tour must have a price"],
 	},
+
+	summary: {
+		type: String,
+		trim: true,
+		required: [true, "A tour must have a summary"],
+	},
+	description: {
+		type: String,
+		trim: true,
+	},
+	imageCover: {
+		type: String,
+		required: [true, "A tour must have a cover Image"],
+	},
+	images: [String],
+	createAt: {
+		type: Date,
+		default: Date.now(),
+	},
+	startDates: [Date],
 });
 // Tour (tours collections) is a Mongoose model -> we perform CRUD on Tour,
-//
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;
