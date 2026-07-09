@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// Schema = Blueprint (what data looks like)
+// Schema = define data structure
 // Model = Tool (used to create, read, update, delete data)
 const tourSchema = new mongoose.Schema({
 	name: {
