@@ -1,5 +1,17 @@
 const Tour = require("../models/tourModel");
 
+exports.aliasTopTours = (req, res, next) => {
+	console.log("aliasTopTours called");
+
+	req.query.limit = "5";
+	req.query.sort = "-ratingsAverage,price";
+	req.query.fields = "ratingsAverage,price,name,summary,difficulty";
+
+	console.log(req.query); // <-- This should print something
+
+	next();
+};
+
 exports.getAllTours = async (req, res) => {
 	try {
 		// 1 . Filtering
@@ -15,7 +27,7 @@ exports.getAllTours = async (req, res) => {
 		// 3. Sorting
 		if (req.query.sort) {
 			const sortBy = req.query.sort.split(",").join(" ");
-      console.log(sortBy)
+			console.log(sortBy);
 			query = query.sort(sortBy);
 		} else {
 			query = query.sort("-createAt");
