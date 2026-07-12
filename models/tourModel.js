@@ -1,62 +1,77 @@
 const mongoose = require("mongoose");
 
-const tourSchema = new mongoose.Schema({
-	name: {
-		type: String,
-		required: [true, "A tour must have a name"], //validate
-		trim: true,
-	},
+const tourSchema = new mongoose.Schema(
+	{
+		name: {
+			type: String,
+			required: [true, "A tour must have a name"], //validate
+			trim: true,
+		},
 
-	duration: {
-		type: Number,
-		required: [true, "A tour must have a duration"],
-	},
+		duration: {
+			type: Number,
+			required: [true, "A tour must have a duration"],
+		},
 
-	maxGroupSize: {
-		type: Number,
-		required: [true, "A tour must have a group size"],
-	},
+		maxGroupSize: {
+			type: Number,
+			required: [true, "A tour must have a group size"],
+		},
 
-	difficulty: {
-		type: String,
-		required: [true, "A tour must have a difficulty"], //validate
-	},
+		difficulty: {
+			type: String,
+			required: [true, "A tour must have a difficulty"], //validate
+		},
 
-	ratingsAverage: {
-		type: Number,
-		default: 4.5,
-	},
+		ratingsAverage: {
+			type: Number,
+			default: 4.5,
+		},
 
-	ratingsQuantity: {
-		type: Number,
-		default: 0,
-	},
-	price: {
-		type: Number,
-		required: [true, "A tour must have a price"],
-	},
+		ratingsQuantity: {
+			type: Number,
+			default: 0,
+		},
+		price: {
+			type: Number,
+			required: [true, "A tour must have a price"],
+		},
 
-	summary: {
-		type: String,
-		trim: true,
-		required: [true, "A tour must have a summary"],
+		summary: {
+			type: String,
+			trim: true,
+			required: [true, "A tour must have a summary"],
+		},
+		description: {
+			type: String,
+			trim: true,
+		},
+		imageCover: {
+			type: String,
+			required: [true, "A tour must have a cover Image"],
+		},
+		images: [String],
+		createdAt: {
+			type: Date,
+			default: Date.now(),
+			select: false,
+		},
+		startDates: [Date],
 	},
-	description: {
-		type: String,
-		trim: true,
+	{
+		// data get output = appear virtual
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
 	},
-	imageCover: {
-		type: String,
-		required: [true, "A tour must have a cover Image"],
-	},
-	images: [String],
-	createAt: {
-		type: Date,
-		default: Date.now(),
-		select: false,
-	},
-	startDates: [Date],
+);
+
+// virtual properties
+// Virtuals are not stored in MongoDB.
+// They are calculated whenever you access them.
+tourSchema.virtual("durationWeeks").get(function () {
+	return this.duration / 7;
 });
+
 // Tour (tours collections) is a Mongoose model -> we perform CRUD on Tour,
 const Tour = mongoose.model("Tour", tourSchema);
 

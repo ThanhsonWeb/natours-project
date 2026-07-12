@@ -113,7 +113,7 @@ exports.deleteTour = async (req, res) => {
 	}
 };
 
-// statistics = thống kê
+// statistics 
 
 exports.getTourStats = async (req, res) => {
 	try {
