@@ -118,24 +118,26 @@ exports.deleteTour = async (req, res) => {
 exports.getTourStats = async (req, res) => {
 	try {
 		const stats = await Tour.aggregate([
-			// define these stages using operator
+			// filters the tours
 			{
 				$match: { ratingsAverage: { $gte: 4.5 } },
 			},
+			// calculates statistics
 			{
 				$group: {
 					_id: "$difficulty",
-					numTours: { $sum: 1 },
+					numTours: { $sum: 1 }, //count documents in the group.
 					numRatings: { $sum: "$ratingsQuantity" },
 					avgRating: { $avg: "$ratingsAverage" },
 					avgPrice: { $avg: "$price" },
-					minPrice: { $min: "$price" },
-					maxPrice: { $max: "$price" },
+					// minPrice: { $min: "$price" },
+					// maxPrice: { $max: "$price" },
 				},
 			},
+			//  (1 = ascending, -1 = descending).
 			{
 				$sort: {
-					avgRating: 1,
+					avgRating: -1,
 				},
 			},
 			// {
@@ -145,13 +147,67 @@ exports.getTourStats = async (req, res) => {
 		// send Response
 		res.status(200).json({
 			status: "success",
+			results: stats.length,
 			data: {
 				stats,
 			},
 		});
 	} catch (err) {
 		res.status(404).json({
-			status: "fail to delete",
+			status: "fail to load",
+			message: err,
+		});
+	}
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+	try {
+		const year = req.params.year * 1; //2021
+		const plan = await Tour.aggregate([
+			{
+				$unwind: "$startDates", // It breaks one document into multiple documents (9*3 = 27)
+			},
+			{
+				$match: {
+					startDates: {
+						$gte: new Date(`${year}-01-01`),
+						$lt: new Date(`${year}-12-31`),
+					},
+				},
+			},
+			{
+				$group: {
+					_id: { $month: "$startDates" },
+					numToursStarts: { $sum: 1 }, // count tour of each month
+					tours: { $push: "$name" },
+				},
+			},
+			{
+				$addFields: { month: "$_id" },
+			},
+			{
+				$project: {
+					_id: 0,
+				},
+			},
+			{
+				$sort: {
+					numToursStarts: -1,
+				},
+			},
+			
+		]);
+
+		res.status(200).json({
+			status: "success",
+			results: plan.length,
+			data: {
+				plan,
+			},
+		});
+	} catch (err) {
+		res.status(404).json({
+			status: "fail to load",
 			message: err,
 		});
 	}
