@@ -93,7 +93,6 @@ tourSchema.pre("save", function (next) {
 // });
 
 // Query MiddleWare
-
 // tourSchema.pre("find", function (next) {
 // /^find/ : for all command start w find "findById,..."
 tourSchema.pre(/^find/, function (next) {
@@ -105,7 +104,28 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.post(/^find/, function (docs, next) {
 	console.log(`Query took ${Date.now() - this.start} milliseconds!`);
-	console.log(docs);
+	// console.log(docs);
+	next();
+});
+
+//Aggregation middleware
+tourSchema.pre("aggregate", function (next) {
+	// Goal : we want to remove VIP tour before it aggregate 🌟
+
+	// unshift = insert at the front
+	// pipeline  is
+//   { '$match': { secretTour: [Object] } },
+//   { '$match': { ratingsAverage: [Object] } },
+//   { '$group': {
+//       _id: '$difficulty',}
+//   },
+//   { '$sort': { avgRating: -1 } }
+
+	this.pipeline().unshift({
+		$match: { secretTour: { $ne: true } },
+	});
+	// "this" is the current aggregation object
+	console.log(this.pipeline());
 	next();
 });
 
