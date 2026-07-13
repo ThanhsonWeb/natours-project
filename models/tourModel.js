@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const slugify = require("slugify");
 const tourSchema = new mongoose.Schema(
 	{
 		name: {
@@ -7,6 +7,7 @@ const tourSchema = new mongoose.Schema(
 			required: [true, "A tour must have a name"], //validate
 			trim: true,
 		},
+		slug: String,
 
 		duration: {
 			type: Number,
@@ -65,14 +66,27 @@ const tourSchema = new mongoose.Schema(
 	},
 );
 
-// virtual properties
-// Virtuals are not stored in MongoDB.
-// They are calculated whenever you access them.
 tourSchema.virtual("durationWeeks").get(function () {
 	return this.duration / 7;
 });
 
-// Tour (tours collections) is a Mongoose model -> we perform CRUD on Tour,
+// Document MiddleWare : runs before .save() and .create()
+// Take the tour's name and convert it into a lowercase, URL-friendly slug, then save it in the slug field.
+tourSchema.pre("save", function (next) {
+	this.slug = slugify(this.name, { lower: true });
+	next();
+});
+
+tourSchema.pre("save", function (next) {
+	console.log("WIll save document");
+	next();
+});
+
+tourSchema.post("save", function (doc, next) {
+	console.log(doc);
+	next();
+});
+
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;
