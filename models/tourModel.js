@@ -58,6 +58,10 @@ const tourSchema = new mongoose.Schema(
 			select: false,
 		},
 		startDates: [Date],
+		secretTour: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{
 		// data get output = appear virtual
@@ -70,20 +74,38 @@ tourSchema.virtual("durationWeeks").get(function () {
 	return this.duration / 7;
 });
 
-// Document MiddleWare : runs before .save() and .create()
-// Take the tour's name and convert it into a lowercase, URL-friendly slug, then save it in the slug field.
+// Document MiddleWare
+// the document before it is saved.
 tourSchema.pre("save", function (next) {
 	this.slug = slugify(this.name, { lower: true });
 	next();
 });
 
-tourSchema.pre("save", function (next) {
-	console.log("WIll save document");
+// tourSchema.pre("save", function (next) {
+// 	console.log("WIll save document");
+// 	next();
+// });
+
+// tourSchema.post("save", function (doc, next) {
+// 	// doc is the saved document
+// 	console.log(doc);
+// 	next();
+// });
+
+// Query MiddleWare
+
+// tourSchema.pre("find", function (next) {
+// /^find/ : for all command start w find "findById,..."
+tourSchema.pre(/^find/, function (next) {
+	this.find({ secretTour: { $ne: true } });
+	this.start = Date.now();
+	// this.find({ secretTour: true  });
 	next();
 });
 
-tourSchema.post("save", function (doc, next) {
-	console.log(doc);
+tourSchema.post(/^find/, function (docs, next) {
+	console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+	console.log(docs);
 	next();
 });
 
