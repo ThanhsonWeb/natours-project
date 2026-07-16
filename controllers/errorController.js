@@ -14,7 +14,7 @@ const handleDuplicateFieldsDB = (err) => {
 
 const handleValidationErrorDB = (err) => {
 	const errorMessage = Object.values(err.errors).map((el) => el.message);
-	const message = `Invalid input data ${errorMessage.join(". ")}`;
+	const message = `Invalid input data - ${errorMessage.join(". ")}`;
 	return new AppError(message, 400);
 };
 
@@ -54,11 +54,14 @@ module.exports = (err, req, res, next) => {
 		let error = err;
 		// name : "CastError" and code: 11000 from our dev mode error
 		//  create conditional base on error in dev mode
+		// getTour (but wrong id  )
 		if (error.name === "CastError") {
 			error = handleCastErrorDB(error);
 		}
-		if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-		if (error.name === "ValidationError") error = handleValidationErrorDB(error);
+		// create (but same filed's value)
+		if (error.code === 11000) error = handleDuplicateFieldsDB(error); 
+		// update (but field is not meet condition )
+		if (error.name === "ValidationError") error = handleValidationErrorDB(error); 
 		
 
 		sendErrorProd(error, res);
