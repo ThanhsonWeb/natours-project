@@ -10,8 +10,10 @@
 	"author": "Son Jony",
 	"license": "ISC",
 	"dependencies": {
+		"bcryptjs": "^3.0.3",
 		"dotenv": "^17.4.2",
 		"express": "^4.22.2",
+		"jsonwebtoken": "^9.0.3",
 		"mongodb": "^7.5.0",
 		"mongoose": "^5.13.23",
 		"morgan": "^1.11.0",
