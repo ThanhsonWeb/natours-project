@@ -15,10 +15,15 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
+// app.use((req, res, next) => {
+// 	 console.log(req.headers);
+// 	next();
+// });
 
 // 2. Routes
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+
 
 // user visit wrong route
 app.all("*", (req, res, next) => {
