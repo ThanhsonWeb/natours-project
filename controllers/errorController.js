@@ -18,6 +18,11 @@ const handleValidationErrorDB = (err) => {
 	return new AppError(message, 400);
 };
 
+const handleJWTError = (err) => {
+	//401 : unauthorized
+	return new AppError("Invalid token. Please log in again", 401);
+};
+
 const sendErrorDev = (err, res) => {
 	res.status(err.statusCode).json({
 		status: err.status,
@@ -52,17 +57,17 @@ module.exports = (err, req, res, next) => {
 		sendErrorDev(err, res);
 	} else if (process.env.NODE_ENV === "production") {
 		let error = err;
-		// name : "CastError" and code: 11000 from our dev mode error
-		//  create conditional base on error in dev mode
-		// getTour (but wrong id  )
+
 		if (error.name === "CastError") {
 			error = handleCastErrorDB(error);
 		}
-		// create (but same filed's value)
-		if (error.code === 11000) error = handleDuplicateFieldsDB(error); 
-		// update (but field is not meet condition )
-		if (error.name === "ValidationError") error = handleValidationErrorDB(error); 
-		
+
+		if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+
+		if (error.name === "ValidationError")
+			error = handleValidationErrorDB(error);
+
+		if (error.name === "JsonWebTokenError") error = handleJWTError(error);
 
 		sendErrorProd(error, res);
 	}
