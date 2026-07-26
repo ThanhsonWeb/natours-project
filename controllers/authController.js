@@ -12,16 +12,15 @@ const signToken = (id) => {
 
 // request handlers
 exports.signup = catchAsync(async (req, res, next) => {
-	// just allow user create these 4 fields
 	const newUser = await User.create({
 		name: req.body.name,
 		email: req.body.email,
 		password: req.body.password,
 		passwordConfirm: req.body.passwordConfirm,
 		passwordChangedAt: req.body.passwordChangedAt,
+		role: req.body.role,
 	});
 
-	// jwt.sign(payload, secret, options)
 	const token = signToken(newUser._id);
 
 	res.status(201).json({
@@ -77,8 +76,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 	// 3. check if user still exists
 	// test : delete user -> old token is Invalid
-	const freshUser = await User.findById(decoded.id);
-	if (!freshUser) {
+	const currentUser = await User.findById(decoded.id);
+	if (!currentUser) {
 		return next(
 			new AppError("The user belonging to this token no longer exists.", 401),
 		);
@@ -88,12 +87,27 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 	// iat (6:00)< passwordChangedAt(6:20) -> true
 	// old token from the old password should be Invalid
-	if (freshUser.changedPasswordAfter(decoded.iat) === true) {
+	if (currentUser.changedPasswordAfter(decoded.iat)) {
 		return next(
 			new AppError("User recently changed password. Please log in again.", 401),
 		);
 	}
 	// GRANT ACCESS TO PROTECTED ROUTE
-	req.user = freshUser;
+	req.user = currentUser;
 	next();
 });
+
+exports.restrictTo = (...roles) => {
+	return (req, res, next) => {
+		console.log("user.role", req.user.role);
+
+		//roles ["admin","lead-guide"]
+		if (!roles.includes(req.user.role)) {
+			return next(
+				new AppError("You do not have permission to perform this action", 403),
+			);
+		}
+
+		next();
+	};
+};
