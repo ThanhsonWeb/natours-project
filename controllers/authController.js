@@ -18,6 +18,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 		email: req.body.email,
 		password: req.body.password,
 		passwordConfirm: req.body.passwordConfirm,
+		passwordChangedAt: req.body.passwordChangedAt,
 	});
 
 	// jwt.sign(payload, secret, options)
@@ -72,12 +73,27 @@ exports.protect = catchAsync(async (req, res, next) => {
 	}
 	// 2.Verification token
 	const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-	console.log(decoded);
+	console.log(decoded); // { id: '6a61496f', iat: 17485, exp: 17885 }
 
 	// 3. check if user still exists
+	// test : delete user -> old token is Invalid
+	const freshUser = await User.findById(decoded.id);
+	if (!freshUser) {
+		return next(
+			new AppError("The user belonging to this token no longer exists.", 401),
+		);
+	}
 
 	// 4. check if user changed password after token was issued
 
-	console.log("hello ");
+	// iat (6:00)< passwordChangedAt(6:20) -> true
+	// old token from the old password should be Invalid
+	if (freshUser.changedPasswordAfter(decoded.iat) === true) {
+		return next(
+			new AppError("User recently changed password. Please log in again.", 401),
+		);
+	}
+	// GRANT ACCESS TO PROTECTED ROUTE
+	req.user = freshUser;
 	next();
 });
