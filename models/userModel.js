@@ -82,18 +82,19 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 // generate a random token -> emailed to the user later .
 userSchema.methods.createPasswordResetToken = function () {
-	const resetToken = crypto.randomBytes(32).toString("hex"); //9a2f8b1d4c7ef6a8b4e91c
+	const resetToken = crypto.randomBytes(32).toString("hex"); //abc123
 
 	this.passwordResetToken = crypto
-		.createHash("sha256")
+		.createHash("sha256") // abc123 -> 9f87d659a2feaa0...
 		.update(resetToken)
 		.digest("hex");
 
 	console.log({ resetToken });
 
 	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+	// 2026-07-27T13:25:34.533+00:00 (this is UTC ) Vn is (UTC + 7 = 13+7 = 20:25)
 
-	return resetToken;
+	return resetToken; // still abc123
 };
 const User = mongoose.model("User", userSchema);
 
