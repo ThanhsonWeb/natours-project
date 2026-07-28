@@ -60,6 +60,8 @@ userSchema.pre("save", async function (next) {
 	next();
 });
 
+
+
 // compare password using bcrypt again
 userSchema.methods.correctPassword = async function (
 	candidatePassword,
@@ -83,7 +85,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 // generate a random token -> emailed to the user later .
 userSchema.methods.createPasswordResetToken = function () {
 	const resetToken = crypto.randomBytes(32).toString("hex"); //abc123
-
+	// store hashed token and expires time to mongoDB
 	this.passwordResetToken = crypto
 		.createHash("sha256") // abc123 -> 9f87d659a2feaa0...
 		.update(resetToken)

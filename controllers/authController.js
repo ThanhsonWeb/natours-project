@@ -115,16 +115,16 @@ exports.restrictTo = (...roles) => {
 };
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-	// 1. Get user based on Posted email
+	// 1. Get user  based on Posted email
 	const user = await User.findOne({ email: req.body.email });
 	if (!user) {
 		return next(new AppError("There is no user with that email address", 404));
 	}
-
+	// Because user is a Mongoose document, and methods defined in userSchema.methods are automatically available on every user document.
 	// 2. Generate the random reset token
 	const resetToken = user.createPasswordResetToken(); //abc123
 
-	await user.save({ validateBeforeSave: false });
+	await user.save({ validateBeforeSave: false }); // don't run validate
 
 	// 3. Send it to user's email
 	const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
@@ -132,7 +132,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 	const message = `Forgot your password? Submit a PATCH req with your new password to : ${resetURL} , If you didn't request a password reset,  please ignore this email `;
 	try {
 		await sendEmail({
-			email: user.email,
+			email: user.email, //son@gmail.com
 			subject: "Your password reset token (valid for 10 minutes)",
 			message,
 		});
@@ -157,7 +157,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-	// 1) Get user based on the token
 	// PATCH /resetPassword/abc123
 	const hashedToken = crypto
 		.createHash("sha256")
@@ -165,13 +164,28 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 		.digest("hex");
 	console.log(hashedToken);
 
+	// 1) Get user based on the token
 	const user = await User.findOne({
-		passwordResetToken: hashedToken,
+		passwordResetToken: hashedToken, // 9f87d.. == 9f87d.. -> true
 		passwordResetExpires: { $gt: Date.now() }, // 20:25 > 20:43 -> FALSE -> NULL
 	});
 
 	if (!user) {
 		return next(new AppError("Token is Invalid or expired", 400));
 	}
+	// modify user
 	user.password = req.body.password;
+	user.passwordConfirm = req.body.passwordConfirm;
+	user.passwordResetToken = undefined; //delete
+	user.passwordResetExpires = undefined; //delete
+	//actually update to mongoDb
+	await user.save();
+
+	// Log the User in, send JWT
+	const token = signToken(user._id);
+
+	res.status(200).json({
+		status: "success ",
+		token,
+	});
 });
