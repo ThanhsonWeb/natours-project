@@ -60,7 +60,12 @@ userSchema.pre("save", async function (next) {
 	next();
 });
 
-
+userSchema.pre("save", function (next) {
+	// create new document -> modify pass
+	if (!this.isModified("password") || this.isNew) return next();
+	this.passwordChangedAt = Date.now() - 1000;
+	next();
+});
 
 // compare password using bcrypt again
 userSchema.methods.correctPassword = async function (
