@@ -15,6 +15,23 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
 
+	const cookieOptions = {
+		// When the cookie automatically expires.
+		expires: new Date(
+			Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+			// convert  into milliseconds
+		),
+
+		httpOnly: true, // JS in the browser cannot read the cookie (prevent XSS attacks).
+	};
+	// cookies is small file store your old behavior on web -> help smoother experience
+	if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+	// secure :Cookie is sent only over HTTPS.
+	res.cookie("jwt", token, cookieOptions);
+
+	// remove the password from res
+	user.password = undefined;
+
 	res.status(statusCode).json({
 		status: "success",
 		token,
@@ -182,12 +199,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 	await user.save();
 
 	// Log the User in, send JWT
-	const token = signToken(user._id);
-
-	res.status(200).json({
-		status: "success ",
-		token,
-	});
+	createSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -204,6 +216,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 	user.password = req.body.password;
 	user.passwordConfirm = req.body.passwordConfirm;
 	await user.save(); // use save instead Update cause "prev save "
-	
+
 	createSendToken(user, 200, res);
 });

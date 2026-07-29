@@ -52,6 +52,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
+	// req.user.id = currentUser.id (decoded.id from protect route )
 	await User.findByIdAndUpdate(req.user.id, { active: false });
 
 	res.status(204).json({
