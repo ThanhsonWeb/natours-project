@@ -191,7 +191,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-	console.log("RUNNNNNNNNNNNNNNNNNNNN");
 	// 1 . Get user from collection
 	// req.user.id = currentUser.id (the guy who login)
 	const user = await User.findById(req.user.id).select("+password");
@@ -205,7 +204,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 	user.password = req.body.password;
 	user.passwordConfirm = req.body.passwordConfirm;
 	await user.save(); // use save instead Update cause "prev save "
-
-	// 4. Log user in
+	
 	createSendToken(user, 200, res);
 });
