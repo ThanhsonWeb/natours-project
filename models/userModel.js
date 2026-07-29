@@ -44,9 +44,14 @@ const userSchema = new mongoose.Schema({
 	passwordChangedAt: Date,
 	passwordResetToken: String,
 	passwordResetExpires: Date,
+	active: {
+		type: Boolean,
+		default: true,
+		select: false,
+	},
 });
 
-// Before create()
+// Document Middleware  (Before save)
 userSchema.pre("save", async function (next) {
 	// Only run if the password was actually modified
 	if (!this.isModified("password")) return next();
@@ -64,6 +69,12 @@ userSchema.pre("save", function (next) {
 	// create new document -> modify pass
 	if (!this.isModified("password") || this.isNew) return next();
 	this.passwordChangedAt = Date.now() - 1000;
+	next();
+});
+
+// Query middleware (before find)
+userSchema.pre(/^find/, function (next) {
+	this.find({ active: { $ne: false } });
 	next();
 });
 
