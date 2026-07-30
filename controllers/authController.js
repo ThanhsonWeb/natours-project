@@ -24,12 +24,12 @@ const createSendToken = (user, statusCode, res) => {
 
 		httpOnly: true, // JS in the browser cannot read the cookie (prevent XSS attacks).
 	};
-	// cookies is small file store your old behavior on web -> help smoother experience
+
 	if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-	// secure :Cookie is sent only over HTTPS.
+
+	// Sends the JWT as a cookie to the browser.
 	res.cookie("jwt", token, cookieOptions);
 
-	// remove the password from res
 	user.password = undefined;
 
 	res.status(statusCode).json({

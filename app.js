@@ -4,26 +4,30 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const globalErrorHandling = require("./controllers/errorController");
 const AppError = require("./utils/appError");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 app.set("query parser", "extended");
 
-// MIDDLEWARES
+// 1.Global MIDDLEWARES
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev")); // login middleware
 }
 
+const limiter = rateLimit({
+	max: 100, // ALLOW 100 req same IP in one hour
+	windowMs: 60 * 60 * 1000,
+	message: "Too many req from this IP, pls try again in an hour",
+});
+
+app.use("/api", limiter);
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
-// app.use((req, res, next) => {
-// 	 console.log(req.headers);
-// 	next();
-// });
 
 // 2. Routes
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
-
 
 // user visit wrong route
 app.all("*", (req, res, next) => {
